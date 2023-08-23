@@ -16,7 +16,16 @@
 #define SHIFT_REG_RCK_PIN PB1
 #define DISPLAY_PINS 16
 
-bool display_pins[DISPLAY_PINS];
+/*
+    10             13
+   ___            ___
+  |   |          |   |
+8 |_9_| 11    12 |_2_|  14
+  |   |          |   |
+15|___| 6  .5  4 |___|  1  .0
+    7              3 
+*/
+bool display_pins[DISPLAY_PINS] = {1,1,0,0,0,1,0,1,1,1,1,0,0,0,1,1};
 
 void init_led() {
     DDRB |= _BV(LED_PIN);
