@@ -7,9 +7,26 @@
 #include "lib/i2c.h"
 #include <util/delay.h>
 
+extern uint16_t ERROR;
+extern uint16_t DOTS;
+
+ISR(INT1_vect) {
+    display(ERROR);
+}
+
+ISR(PCINT0_vect) {
+    display(DOTS);
+}
+
+ISR(PCINT1_vect) {
+    display(DOTS);
+}
+
 void init() {
     init_display();
     init_RTC_clock();
+    init_buttons();
+    init_interrupts();
 
     _delay_ms(500);
     sei();

@@ -35,9 +35,9 @@ static void I2C_write_data(uint8_t data) {
 /*
 Send a byte of data
        ____    ____    ____
-SDA __/    \__/    \__/    \__
-        __      __      __
-SCL ___/  \____/  \____/  \___
+SDA __/    \__/    \__/    \__________
+        __      __      __      __
+SCL ___/  \____/  \____/  \____/  \___
 */
 static void I2C_write(uint8_t data) {
     uint8_t i;
