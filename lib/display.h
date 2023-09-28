@@ -9,6 +9,7 @@
 #define OUTPUT_PINS 16
 
 void init_display();
+void display_number(uint8_t number);
 void display(uint16_t output);
 
 #endif
