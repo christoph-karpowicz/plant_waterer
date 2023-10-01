@@ -18,11 +18,13 @@ volatile bool display_greeting = true;
 volatile bool timer_1_sec_mode;
 volatile uint32_t timer_seconds;
 
+// main clock interrupt
 ISR(INT1_vect) {
     if (display_greeting) {
         display(EMPTY);
         display_greeting = false;
     }
+    
     if (TIMER_TOP + 10 < timer_seconds) {
         display(EMPTY);
         timer_1_sec_mode = false;
@@ -43,18 +45,11 @@ ISR(INT1_vect) {
     }
 }
 
-ISR(INT0_vect) {
-    display(DOTS);
-    timer_seconds = 0;
-    timer_1_sec_mode = false;
-    ten_seconds_clock_enable();
-}
-
 void init() {
     init_RTC_clock();
     init_buttons();
     init_clock_drivers();
-    init_interrupts();
+    init_clock_interrupts();
     init_display();
 
     _delay_ms(500);
