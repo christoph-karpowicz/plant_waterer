@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "buttons.h"
 #include "display.h"
+#include "clock.h"
 
 #define BUTTON_STANDBY_TIMER_TOP 255
 
@@ -30,6 +31,10 @@ void init_buttons() {
     TCCR0A |= _BV(WGM01);
     // Timer TOP value
     OCR0A = 10;
+}
+
+bool are_buttons_active() {
+    return blue_button_active || red_button_active;
 }
 
 static void enable_timer_interrupt() {
@@ -60,6 +65,7 @@ static void reset_buttons() {
 }
 
 static void handle_button_press(uint8_t *button_wait_timer, bool *button_active) {
+    wake_up();
     if (*button_wait_timer >= BUTTON_STANDBY_TIMER_TOP) {
         enable_timer_interrupt();
         *button_wait_timer = 0;

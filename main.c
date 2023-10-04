@@ -1,6 +1,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <stdbool.h>
+#include <avr/sleep.h>
 #include "lib/init.h"
 #include "lib/display.h"
 #include "lib/buttons.h"
@@ -17,6 +18,12 @@ extern uint16_t EMPTY;
 volatile bool display_greeting = true;
 volatile bool timer_1_sec_mode;
 volatile uint32_t timer_seconds;
+
+void put_to_sleep() {
+    if (!are_buttons_active()) {
+        sleep();
+    }
+}
 
 // main clock interrupt
 ISR(INT1_vect) {
@@ -43,6 +50,8 @@ ISR(INT1_vect) {
     } else {
         timer_seconds++;
     }
+
+    put_to_sleep();
 }
 
 void init() {
@@ -58,7 +67,13 @@ void init() {
 
 int main(void) {
     init();
+    set_sleep_mode(SLEEP_MODE_IDLE);
     while (1) {
+        if (is_sleeping()) {
+            sleep_enable();
+            sleep_cpu();
+            sleep_disable();
+        }
     }
     return 0;
 }
