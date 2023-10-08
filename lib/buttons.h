@@ -2,6 +2,6 @@
 #define BUTTONS_H
 
 void init_buttons();
-bool are_buttons_active();
+uint8_t are_buttons_active();
 
 #endif

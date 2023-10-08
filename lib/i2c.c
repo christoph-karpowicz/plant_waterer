@@ -1,8 +1,6 @@
 #include <avr/io.h>
-#include <stdbool.h>
-#include "init.h"
-#include <util/delay.h>
 #include "i2c.h"
+#include <util/delay.h>
 
 #define I2C_DDR DDRD
 #define I2C_PIN PIND

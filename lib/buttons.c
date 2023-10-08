@@ -1,6 +1,5 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <stdbool.h>
 #include "display.h"
 #include "buttons.h"
 #include "clock.h"
@@ -9,12 +8,13 @@
 #define BUTTON_STANDBY_TIMER_TOP 255
 #define BUTTONS_ACTIVE_MAX_TIME 120
 
-volatile uint8_t counter1;
-volatile uint8_t counter2;
-volatile bool blue_button_active;
-volatile uint8_t blue_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
-volatile bool red_button_active;
-volatile uint8_t red_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
+extern uint8_t interval[];
+
+uint8_t counter;
+uint8_t blue_button_active;
+uint8_t blue_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
+uint8_t red_button_active;
+uint8_t red_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
 
 void init_buttons() {
     // blue button interrupt
@@ -33,7 +33,7 @@ void init_buttons() {
     OCR0A = 10;
 }
 
-bool are_buttons_active() {
+uint8_t are_buttons_active() {
     return blue_button_active || red_button_active;
 }
 
@@ -45,51 +45,133 @@ static void disable_timer_interrupt() {
     TIMSK &= ~_BV(OCIE0A);
 }
 
+static void reset_and_display_counter() {
+    counter = 0;
+    display_number(counter);
+}
+
 static void do_red_button_action() {
-    if (get_mode() == MENU_MODE) {
-        set_option(true);
-    } else {
-        display_number(++counter1);
+    switch (get_mode()) {
+        case MENU_MODE:
+        case SETTINGS_MODE:
+        case INTERVAL_SETTINGS_MODE:
+            set_option(1);
+            break;
+        case INTERVAL_HOURS_SETTING_MODE:
+            if (counter < 99) {
+                display_number(++counter);
+            }
+            break;
+        case INTERVAL_MINUTES_SETTING_MODE:
+        case INTERVAL_SECONDS_SETTING_MODE:
+            if (counter < 60) {
+                display_number(++counter);
+            }
+            break;
     }
 }
 
 static void do_blue_button_action() {
-    if (get_mode() == OFF_MODE) {
-        set_mode(MENU_MODE);
-    } else if (get_mode() == MENU_MODE) {
-        set_option(false);
-    } else {
-        display_number(++counter2);
+    switch (get_mode()) {
+        case OFF_MODE:
+            set_mode(MENU_MODE);
+            break;
+        case MENU_MODE:
+        case SETTINGS_MODE:
+        case INTERVAL_SETTINGS_MODE:
+            set_option(0);
+            break;
+        case INTERVAL_HOURS_SETTING_MODE:
+        case INTERVAL_MINUTES_SETTING_MODE:
+        case INTERVAL_SECONDS_SETTING_MODE:
+            if (counter > 0) {
+                display_number(--counter);
+            }
+            break;
     }
 }
 
 static void do_both_button_action() {
-    if (get_mode() == MENU_MODE) {
-        if (get_option() == MENU_EXIT_OPTION) {
-            set_mode(OFF_MODE);
-        }
-    } else {
-        display(DOTS);
+    switch (get_mode()) {
+        case MENU_MODE:
+            switch (get_option()) {
+                case MENU_EXIT_OPTION:
+                    set_mode(OFF_MODE);
+                    break;
+                case MENU_SHOW_INTERVAL_OPTION:
+                    set_mode(SHOW_INTERVAL_MODE);
+                    break;
+                case MENU_SETTINGS_OPTION:
+                    set_mode(SETTINGS_MODE);
+                    break;
+            }
+            break;
+        case SHOW_INTERVAL_MODE:
+            set_mode(MENU_MODE);
+        case SETTINGS_MODE:
+            switch (get_option()) {
+                case SETTINGS_EXIT_OPTION:
+                    set_mode(MENU_MODE);
+                    break;
+                case SETTINGS_INTERVAL_SETTING_OPTION:
+                    set_mode(INTERVAL_SETTINGS_MODE);
+                    break;
+            }
+            break;
+        case INTERVAL_SETTINGS_MODE:
+            switch (get_option()) {
+                case INTERVAL_SETTINGS_EXIT_OPTION:
+                    set_mode(SETTINGS_MODE);
+                    break;
+                case INTERVAL_SETTINGS_HOURS_OPTION:
+                    set_mode(INTERVAL_HOURS_SETTING_MODE);
+                    reset_and_display_counter();
+                    break;
+                case INTERVAL_SETTINGS_MINUTES_OPTION:
+                    set_mode(INTERVAL_MINUTES_SETTING_MODE);
+                    reset_and_display_counter();
+                    break;
+                case INTERVAL_SETTINGS_SECONDS_OPTION:
+                    set_mode(INTERVAL_SECONDS_SETTING_MODE);
+                    reset_and_display_counter();
+                    break;
+            }
+            break;
+        case INTERVAL_HOURS_SETTING_MODE:
+            set_interval_hours(counter);
+            set_timer_top(interval[0], interval[1], interval[2]);
+            set_mode(MENU_MODE);
+            break;
+        case INTERVAL_MINUTES_SETTING_MODE:
+            set_interval_minutes(counter);
+            set_timer_top(interval[0], interval[1], interval[2]);
+            set_mode(MENU_MODE);
+            break;
+        case INTERVAL_SECONDS_SETTING_MODE:
+            set_interval_seconds(counter);
+            set_timer_top(interval[0], interval[1], interval[2]);
+            set_mode(MENU_MODE);
+            break;
     }
 }
 
 static void reset_buttons() {
-    red_button_active = false;
-    blue_button_active = false;
+    red_button_active = 0;
+    blue_button_active = 0;
     blue_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
     red_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
 }
 
-static void handle_button_press(uint8_t *button_wait_timer, bool *button_active) {
+static void handle_button_press(uint8_t *button_wait_timer, uint8_t *button_active) {
     wake_up();
     if (*button_wait_timer >= BUTTON_STANDBY_TIMER_TOP) {
         enable_timer_interrupt();
         *button_wait_timer = 0;
-        *button_active = true;
+        *button_active = 1;
     }
 }
 
-static void handle_button_timer_interrupt(uint8_t *button_wait_timer, bool *button_active,
+static void handle_button_timer_interrupt(uint8_t *button_wait_timer, uint8_t *button_active,
                                           void (*action_func)()) {
     if (!(*button_active)) {
         return;
@@ -101,7 +183,7 @@ static void handle_button_timer_interrupt(uint8_t *button_wait_timer, bool *butt
             reset_buttons();
         } else {
             (*action_func)();
-            *button_active = false;
+            *button_active = 0;
         }
         if (!blue_button_active && !red_button_active) {
             disable_timer_interrupt();
