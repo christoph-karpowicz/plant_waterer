@@ -1,5 +1,3 @@
-#include <avr/io.h>
-#include <avr/interrupt.h>
 #include "display.h"
 #include "buttons.h"
 #include "clock.h"
@@ -8,13 +6,16 @@
 #define BUTTON_STANDBY_TIMER_TOP 255
 #define BUTTONS_ACTIVE_MAX_TIME 120
 
+#define enable_timer_interrupt() TIMSK |= _BV(OCIE0A)
+#define disable_timer_interrupt() TIMSK &= ~_BV(OCIE0A)
+
 extern uint8_t interval[];
 
-uint8_t counter;
-uint8_t blue_button_active;
-uint8_t blue_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
-uint8_t red_button_active;
-uint8_t red_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
+static uint8_t counter;
+static bool blue_button_active;
+static uint8_t blue_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
+static bool red_button_active;
+static uint8_t red_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
 
 void init_buttons() {
     // blue button interrupt
@@ -33,16 +34,8 @@ void init_buttons() {
     OCR0A = 10;
 }
 
-uint8_t are_buttons_active() {
+bool are_buttons_active() {
     return blue_button_active || red_button_active;
-}
-
-static void enable_timer_interrupt() {
-    TIMSK |= _BV(OCIE0A);
-}
-
-static void disable_timer_interrupt() {
-    TIMSK &= ~_BV(OCIE0A);
 }
 
 static void reset_and_display_counter() {
@@ -156,8 +149,8 @@ static void do_both_button_action() {
 }
 
 static void reset_buttons() {
-    red_button_active = 0;
-    blue_button_active = 0;
+    red_button_active = false;
+    blue_button_active = false;
     blue_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
     red_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
 }

@@ -1,12 +1,11 @@
-#include <avr/io.h>
-#include <avr/interrupt.h>
+#include "clock.h"
 #include "display.h"
 
-uint8_t timer_1_sec_mode;
-uint8_t sleep_mode_on;
-uint8_t display_greeting = 1;
-uint32_t timer_top = 60;
-volatile uint32_t timer_seconds;
+static bool timer_1_sec_mode;
+static bool sleep_mode_on;
+static bool display_greeting = 1;
+static uint32_t timer_top = 60;
+static volatile uint32_t timer_seconds;
 
 static void one_second_clock_enable() {
     PORTB |= (_BV(PB2) | _BV(PB3));
@@ -17,16 +16,16 @@ static void ten_seconds_clock_enable() {
 }
 
 static void timer_1_sec_mode_on() {
-    timer_1_sec_mode = 1;
+    timer_1_sec_mode = true;
 }
 
 static void timer_1_sec_mode_off() {
-    timer_1_sec_mode = 0;
+    timer_1_sec_mode = false;
 }
 
 static void sleep() {
     if (!are_buttons_active()) {
-        sleep_mode_on = 1;
+        sleep_mode_on = true;
     }
 }
 
@@ -41,10 +40,10 @@ void init_clock_interrupts() {
 }
 
 void wake_up() {
-    sleep_mode_on = 0;
+    sleep_mode_on = false;
 }
 
-uint8_t is_sleeping() {
+bool is_sleeping() {
     return sleep_mode_on;
 }
 
@@ -65,13 +64,13 @@ ISR(INT1_vect) {
     
     if (timer_top + 10 < timer_seconds) {
         display(EMPTY);
-        timer_1_sec_mode = 0;
+        timer_1_sec_mode = false;
         timer_seconds = 0;
         ten_seconds_clock_enable();
     } else if (timer_top < timer_seconds) {
         display(DOTS);
     } else if (timer_top - 10 <= timer_seconds) {
-        timer_1_sec_mode = 1;
+        timer_1_sec_mode = true;
         one_second_clock_enable();
         display_number(timer_top - timer_seconds);
     }

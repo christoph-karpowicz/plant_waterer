@@ -1,6 +1,4 @@
-#include <avr/io.h>
 #include "i2c.h"
-#include <util/delay.h>
 
 #define I2C_DDR DDRD
 #define I2C_PIN PIND
@@ -23,12 +21,10 @@ I2C_DDR &= ~_BV(I2C_CLK);
 #define I2C_CLOCK_LOW()\
 I2C_DDR |= _BV(I2C_CLK);
 
-static void delay() {
-    // DS1307 has a 100Khz clock rate
-    // F_CPU is 1Mhz
-    // Delay of 10 us gives 100Khz
-    _delay_us(10);
-}
+// DS1307 has a 100Khz clock rate
+// F_CPU is 1Mhz
+// Delay of 10 us gives 100Khz
+#define delay() _delay_us(10)
 
 static void I2C_ack() {
     I2C_CLOCK_HIGH();
@@ -60,7 +56,7 @@ SCL ___/  \____/  \____/  \____/  \___
 */
 static void I2C_write(uint8_t data) {
     uint8_t i;
-    for (i = 0; i < 8; i++) {
+    for (i = 8; i > 0; i--) {
         I2C_write_data(data & 0b10000000);
         data <<= 1;
     }

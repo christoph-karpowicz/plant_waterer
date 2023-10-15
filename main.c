@@ -1,4 +1,3 @@
-#include <avr/interrupt.h>
 #include <avr/sleep.h>
 #include "lib/display.h"
 #include "lib/buttons.h"

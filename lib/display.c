@@ -1,4 +1,3 @@
-#include <avr/io.h>
 #include "display.h"
 
 #define SHIFT_REG_SERIAL_PORT PORTD
@@ -8,7 +7,7 @@
 #define SHIFT_REG_RCK_PIN PB1
 #define OUTPUT_PINS 16
 
-uint16_t LEFT_DIGITS[] = {
+static uint16_t LEFT_DIGITS[] PROGMEM = {
     0b1111110001001110,
     0b1111110111101111,
     0b1111111010001110,
@@ -20,7 +19,7 @@ uint16_t LEFT_DIGITS[] = {
     0b1111110000001110,
     0b1111110000001111
 };
-uint16_t RIGHT_DIGITS[] = {
+static uint16_t RIGHT_DIGITS[] PROGMEM = {
     0b1010011111110001,
     0b1011111111111101,
     0b1100011111111001,
@@ -49,14 +48,15 @@ void display_number(uint8_t number) {
     
     uint8_t left_segment = number / 10;
     uint8_t right_segment = number % 10;
-    display(LEFT_DIGITS[left_segment] & RIGHT_DIGITS[right_segment]);
+    display(pgm_read_word(&LEFT_DIGITS[left_segment]) 
+        & pgm_read_word(&RIGHT_DIGITS[right_segment]));
 }
 
 void display(uint16_t output) {
     SHIFT_REG_CK_PORT &= ~_BV(SHIFT_REG_RCK_PIN);
     uint8_t i;
     uint16_t mask = 0b1000000000000000;
-    for (i = 0; i < OUTPUT_PINS; i++) {
+    for (i = OUTPUT_PINS; i > 0; i--) {
         SHIFT_REG_CK_PORT &= ~_BV(SHIFT_REG_SCK_PIN);
         if (output & mask) {
             SHIFT_REG_SERIAL_PORT |= _BV(SHIFT_REG_SERIAL_PIN);

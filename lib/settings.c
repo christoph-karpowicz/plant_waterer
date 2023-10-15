@@ -1,5 +1,3 @@
-#include <avr/io.h>
-#include "display.h"
 #include "settings.h"
 
 uint8_t interval[] = {
@@ -7,11 +5,11 @@ uint8_t interval[] = {
     0, // minutes
     0 // seconds
 };
-uint8_t setting_mode;
-uint8_t current_mode = OFF_MODE;
-uint8_t current_option;
+static uint8_t setting_mode;
+static uint8_t current_mode = OFF_MODE;
+static uint8_t current_option;
 
-struct Options opts[] = {
+static struct Options opts[] PROGMEM = {
     // MENU_MODE
     {
         .last = 2,
@@ -50,10 +48,6 @@ struct Options opts[] = {
     }
 };
 
-void setting_mode_off() {
-    set_mode(OFF_MODE);
-}
-
 uint8_t get_mode() {
     return current_mode;
 }
@@ -67,7 +61,7 @@ void set_mode(uint8_t mode) {
     } else if (current_mode == SHOW_INTERVAL_MODE) {
         display_number(interval[current_option]);
     } else {
-        display(opts[current_mode].opts[current_option]);
+        display(pgm_read_word(&opts[current_mode].opts[current_option]));
     }
 }
 
@@ -77,7 +71,7 @@ uint8_t get_option() {
 
 void set_option(uint8_t next) {
     if (next) {
-        if (current_option < opts[current_mode].last) {
+        if (current_option < pgm_read_byte(&opts[current_mode].last)) {
             current_option++;
         }
     } else {
@@ -87,20 +81,8 @@ void set_option(uint8_t next) {
     }
 
     if (current_mode != SHOW_INTERVAL_MODE) {
-        display(opts[current_mode].opts[current_option]);
+        display(pgm_read_word(&opts[current_mode].opts[current_option]));
     } else {
         display_number(interval[current_option]);
     }
-}
-
-void set_interval_hours(uint8_t hours) {
-    interval[0] = hours;
-}
-
-void set_interval_minutes(uint8_t minutes) {
-    interval[1] = minutes;
-}
-
-void set_interval_seconds(uint8_t seconds) {
-    interval[2] = seconds;
 }

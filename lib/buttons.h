@@ -1,7 +1,9 @@
 #ifndef BUTTONS_H
 #define BUTTONS_H
 
+#include <stdbool.h>
+
 void init_buttons();
-uint8_t are_buttons_active();
+bool are_buttons_active();
 
 #endif

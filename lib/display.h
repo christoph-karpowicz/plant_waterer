@@ -1,6 +1,9 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+#include <avr/io.h>
+#include <avr/pgmspace.h>
+
 /*
     10             13
    ___            ___
