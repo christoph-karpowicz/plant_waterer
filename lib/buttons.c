@@ -10,6 +10,7 @@
 #define disable_timer_interrupt() TIMSK &= ~_BV(OCIE0A)
 
 extern uint8_t interval[];
+extern uint8_t duration[];
 
 static uint8_t counter;
 static bool blue_button_active;
@@ -46,9 +47,10 @@ static void reset_and_display_counter() {
 static void do_red_button_action() {
     switch (get_mode()) {
         case MENU_MODE:
+        case SHOW_INTERVAL_MODE:
         case SETTINGS_MODE:
         case INTERVAL_SETTINGS_MODE:
-            set_option(1);
+            set_option(true);
             break;
         case INTERVAL_HOURS_SETTING_MODE:
             if (counter < 99) {
@@ -70,9 +72,10 @@ static void do_blue_button_action() {
             set_mode(MENU_MODE);
             break;
         case MENU_MODE:
+        case SHOW_INTERVAL_MODE:
         case SETTINGS_MODE:
         case INTERVAL_SETTINGS_MODE:
-            set_option(0);
+            set_option(false);
             break;
         case INTERVAL_HOURS_SETTING_MODE:
         case INTERVAL_MINUTES_SETTING_MODE:
@@ -88,34 +91,37 @@ static void do_both_button_action() {
     switch (get_mode()) {
         case MENU_MODE:
             switch (get_option()) {
-                case MENU_EXIT_OPTION:
-                    set_mode(OFF_MODE);
-                    break;
                 case MENU_SHOW_INTERVAL_OPTION:
                     set_mode(SHOW_INTERVAL_MODE);
+                    break;
+                case MENU_SHOW_DURATION_OPTION:
+                    set_mode(SHOW_DURATION_MODE);
                     break;
                 case MENU_SETTINGS_OPTION:
                     set_mode(SETTINGS_MODE);
                     break;
+                default:
+                    set_mode(OFF_MODE);
             }
             break;
         case SHOW_INTERVAL_MODE:
+        case SHOW_DURATION_MODE:
             set_mode(MENU_MODE);
+            break;
         case SETTINGS_MODE:
             switch (get_option()) {
-                case SETTINGS_EXIT_OPTION:
-                    set_mode(MENU_MODE);
-                    break;
                 case SETTINGS_INTERVAL_SETTING_OPTION:
                     set_mode(INTERVAL_SETTINGS_MODE);
                     break;
+                case SETTINGS_DURATION_SETTING_OPTION:
+                    set_mode(DURATION_SETTINGS_MODE);
+                    break;
+                default:
+                    set_mode(MENU_MODE);
             }
             break;
         case INTERVAL_SETTINGS_MODE:
             switch (get_option()) {
-                case INTERVAL_SETTINGS_EXIT_OPTION:
-                    set_mode(SETTINGS_MODE);
-                    break;
                 case INTERVAL_SETTINGS_HOURS_OPTION:
                     set_mode(INTERVAL_HOURS_SETTING_MODE);
                     reset_and_display_counter();
@@ -128,6 +134,22 @@ static void do_both_button_action() {
                     set_mode(INTERVAL_SECONDS_SETTING_MODE);
                     reset_and_display_counter();
                     break;
+                default:
+                    set_mode(SETTINGS_MODE);
+            }
+            break;
+        case DURATION_SETTINGS_MODE:
+            switch (get_option()) {
+                case DURATION_SETTINGS_MINUTES_OPTION:
+                    set_mode(DURATION_MINUTES_SETTING_MODE);
+                    reset_and_display_counter();
+                    break;
+                case DURATION_SETTINGS_SECONDS_OPTION:
+                    set_mode(DURATION_SECONDS_SETTING_MODE);
+                    reset_and_display_counter();
+                    break;
+                default:
+                    set_mode(SETTINGS_MODE);
             }
             break;
         case INTERVAL_HOURS_SETTING_MODE:
@@ -143,6 +165,14 @@ static void do_both_button_action() {
         case INTERVAL_SECONDS_SETTING_MODE:
             set_interval_seconds(counter);
             set_timer_top(interval[0], interval[1], interval[2]);
+            set_mode(MENU_MODE);
+            break;
+        case DURATION_MINUTES_SETTING_MODE:
+            set_duration_minutes(counter);
+            set_mode(MENU_MODE);
+            break;
+        case DURATION_SECONDS_SETTING_MODE:
+            set_duration_seconds(counter);
             set_mode(MENU_MODE);
             break;
     }

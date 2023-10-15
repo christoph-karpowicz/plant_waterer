@@ -5,7 +5,7 @@ static bool timer_1_sec_mode;
 static bool sleep_mode_on;
 static bool display_greeting = 1;
 static uint32_t timer_top = 60;
-static volatile uint32_t timer_seconds;
+static uint32_t timer_seconds;
 
 static void one_second_clock_enable() {
     PORTB |= (_BV(PB2) | _BV(PB3));
@@ -13,14 +13,6 @@ static void one_second_clock_enable() {
 
 static void ten_seconds_clock_enable() {
     PORTB &= ~(_BV(PB2) | _BV(PB3));
-}
-
-static void timer_1_sec_mode_on() {
-    timer_1_sec_mode = true;
-}
-
-static void timer_1_sec_mode_off() {
-    timer_1_sec_mode = false;
 }
 
 static void sleep() {

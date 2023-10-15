@@ -5,46 +5,50 @@ uint8_t interval[] = {
     0, // minutes
     0 // seconds
 };
+uint8_t duration[] = {
+    0, // minutes
+    0 // seconds
+};
 static uint8_t setting_mode;
 static uint8_t current_mode = OFF_MODE;
 static uint8_t current_option;
 
-static struct Options opts[] PROGMEM = {
+uint16_t opts[6][3] PROGMEM = {
     // MENU_MODE
     {
-        .last = 2,
-        .opts = {
-            DISPLAY_SHOW_INTERVAL_OPTION,
-            DISPLAY_SETTINGS_OPTION,
-            DISPLAY_EXIT
-        }
+        DISPLAY_SHOW_INTERVAL_OPTION,
+        DISPLAY_SHOW_DURATION_OPTION,
+        DISPLAY_SETTINGS_OPTION
     },
     // SHOW_INTERVAL_MODE
     {
-        .last = 2,
-        .opts = {
-            DISPLAY_INTERVAL_HOURS_OPTION,
-            DISPLAY_INTERVAL_MINUTES_OPTION,
-            DISPLAY_INTERVAL_SECONDS_OPTION
-        }
+        DISPLAY_HOURS_OPTION,
+        DISPLAY_MINUTES_OPTION,
+        DISPLAY_SECONDS_OPTION
+    },
+    // SHOW_DURATION_MODE
+    {
+        DISPLAY_MINUTES_OPTION,
+        DISPLAY_SECONDS_OPTION,
+        DISPLAY_EXIT
     },
     // SETTINGS_MODE
     {
-        .last = 1,
-        .opts = {
-            DISPLAY_SETTINGS_INTERVAL_OPTION,
-            DISPLAY_EXIT
-        }
+        DISPLAY_SETTINGS_INTERVAL_OPTION,
+        DISPLAY_SETTINGS_DURATION_OPTION,
+        DISPLAY_EXIT
     },
     // INTERVAL_SETTINGS_MODE
     {
-        .last = 3,
-        .opts = {
-            DISPLAY_SETTINGS_HOURS_OPTION,
-            DISPLAY_SETTINGS_MINUTES_OPTION,
-            DISPLAY_SETTINGS_SECONDS_OPTION,
-            DISPLAY_EXIT
-        }
+        DISPLAY_SETTINGS_HOURS_OPTION,
+        DISPLAY_SETTINGS_MINUTES_OPTION,
+        DISPLAY_SETTINGS_SECONDS_OPTION
+    },
+    // DURATION_SETTINGS_MODE
+    {
+        DISPLAY_SETTINGS_MINUTES_OPTION,
+        DISPLAY_SETTINGS_SECONDS_OPTION,
+        DISPLAY_EXIT
     }
 };
 
@@ -60,8 +64,10 @@ void set_mode(uint8_t mode) {
         display(EMPTY);
     } else if (current_mode == SHOW_INTERVAL_MODE) {
         display_number(interval[current_option]);
+    } else if (current_mode == SHOW_DURATION_MODE) {
+        display_number(duration[current_option]);
     } else {
-        display(pgm_read_word(&opts[current_mode].opts[current_option]));
+        display(pgm_read_word(&opts[current_mode][current_option]));
     }
 }
 
@@ -69,10 +75,13 @@ uint8_t get_option() {
     return current_option;
 }
 
-void set_option(uint8_t next) {
+void set_option(bool next) {
     if (next) {
-        if (current_option < pgm_read_byte(&opts[current_mode].last)) {
+        if (current_option < 2) {
             current_option++;
+        } else {
+            display(DISPLAY_EXIT);
+            return;
         }
     } else {
         if (current_option > 0) {
@@ -80,9 +89,11 @@ void set_option(uint8_t next) {
         }
     }
 
-    if (current_mode != SHOW_INTERVAL_MODE) {
-        display(pgm_read_word(&opts[current_mode].opts[current_option]));
-    } else {
+    if (current_mode == SHOW_INTERVAL_MODE) {
         display_number(interval[current_option]);
+    } else if (current_mode == SHOW_DURATION_MODE) {
+        display_number(duration[current_option]);
+    } else {
+        display(pgm_read_word(&opts[current_mode][current_option]));
     }
 }
