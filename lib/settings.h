@@ -11,10 +11,10 @@
 #define SHOW_DURATION_MODE 2
 #define SETTINGS_MODE 3
 #define INTERVAL_SETTINGS_MODE 4
-#define INTERVAL_HOURS_SETTING_MODE 5
-#define INTERVAL_MINUTES_SETTING_MODE 6
-#define INTERVAL_SECONDS_SETTING_MODE 7
-#define DURATION_SETTINGS_MODE 8
+#define DURATION_SETTINGS_MODE 5
+#define INTERVAL_HOURS_SETTING_MODE 6
+#define INTERVAL_MINUTES_SETTING_MODE 7
+#define INTERVAL_SECONDS_SETTING_MODE 8
 #define DURATION_MINUTES_SETTING_MODE 9
 #define DURATION_SECONDS_SETTING_MODE 10
 #define OFF_MODE 11
@@ -47,6 +47,6 @@
 uint8_t get_mode();
 void set_mode(uint8_t mode);
 uint8_t get_option();
-void set_option(bool next);
+void set_option(int8_t next_option);
 
 #endif

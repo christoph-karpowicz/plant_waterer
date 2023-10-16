@@ -9,9 +9,8 @@ uint8_t duration[] = {
     0, // minutes
     0 // seconds
 };
-static uint8_t setting_mode;
 static uint8_t current_mode = OFF_MODE;
-static uint8_t current_option;
+static int8_t current_option;
 
 uint16_t opts[6][3] PROGMEM = {
     // MENU_MODE
@@ -30,13 +29,13 @@ uint16_t opts[6][3] PROGMEM = {
     {
         DISPLAY_MINUTES_OPTION,
         DISPLAY_SECONDS_OPTION,
-        DISPLAY_EXIT
+        0
     },
     // SETTINGS_MODE
     {
         DISPLAY_SETTINGS_INTERVAL_OPTION,
         DISPLAY_SETTINGS_DURATION_OPTION,
-        DISPLAY_EXIT
+        0
     },
     // INTERVAL_SETTINGS_MODE
     {
@@ -48,7 +47,7 @@ uint16_t opts[6][3] PROGMEM = {
     {
         DISPLAY_SETTINGS_MINUTES_OPTION,
         DISPLAY_SETTINGS_SECONDS_OPTION,
-        DISPLAY_EXIT
+        0
     }
 };
 
@@ -57,17 +56,16 @@ uint8_t get_mode() {
 }
 
 void set_mode(uint8_t mode) {
-    current_option = 0;
     current_mode = mode;
 
     if (current_mode == OFF_MODE) {
         display(EMPTY);
     } else if (current_mode == SHOW_INTERVAL_MODE) {
-        display_number(interval[current_option]);
+        display_number(interval[0]);
     } else if (current_mode == SHOW_DURATION_MODE) {
-        display_number(duration[current_option]);
+        display_number(duration[0]);
     } else {
-        display(pgm_read_word(&opts[current_mode][current_option]));
+        set_option(0);
     }
 }
 
@@ -75,18 +73,18 @@ uint8_t get_option() {
     return current_option;
 }
 
-void set_option(bool next) {
-    if (next) {
-        if (current_option < 2) {
-            current_option++;
-        } else {
-            display(DISPLAY_EXIT);
-            return;
-        }
-    } else {
-        if (current_option > 0) {
-            current_option--;
-        }
+void set_option(int8_t next_option) {
+    const uint16_t opt = pgm_read_word(&opts[current_mode][next_option]);
+    
+    if (next_option > 3 || next_option < 0) {
+        return;
+    }
+
+    current_option = next_option;
+
+    if (next_option > 2 || opt == 0) {
+        display(DISPLAY_EXIT);
+        return;
     }
 
     if (current_mode == SHOW_INTERVAL_MODE) {
@@ -94,6 +92,6 @@ void set_option(bool next) {
     } else if (current_mode == SHOW_DURATION_MODE) {
         display_number(duration[current_option]);
     } else {
-        display(pgm_read_word(&opts[current_mode][current_option]));
+        display(opt);
     }
 }

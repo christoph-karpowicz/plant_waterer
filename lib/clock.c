@@ -41,10 +41,7 @@ bool is_sleeping() {
 
 void set_timer_top(uint8_t interval_hours, uint8_t interval_minutes,
                    uint8_t interval_seconds) {
-    timer_top = 0;
-    timer_top += interval_hours * 60 * 60;
-    timer_top += interval_minutes * 60;
-    timer_top += interval_seconds;
+    timer_top = (interval_hours * 60 * 60) + (interval_minutes * 60) + interval_seconds;
 }
 
 // main clock interrupt

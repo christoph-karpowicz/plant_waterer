@@ -48,9 +48,11 @@ static void do_red_button_action() {
     switch (get_mode()) {
         case MENU_MODE:
         case SHOW_INTERVAL_MODE:
+        case SHOW_DURATION_MODE:
         case SETTINGS_MODE:
         case INTERVAL_SETTINGS_MODE:
-            set_option(true);
+        case DURATION_SETTINGS_MODE:
+            set_option(get_option() + 1);
             break;
         case INTERVAL_HOURS_SETTING_MODE:
             if (counter < 99) {
@@ -59,6 +61,8 @@ static void do_red_button_action() {
             break;
         case INTERVAL_MINUTES_SETTING_MODE:
         case INTERVAL_SECONDS_SETTING_MODE:
+        case DURATION_MINUTES_SETTING_MODE:
+        case DURATION_SECONDS_SETTING_MODE:
             if (counter < 60) {
                 display_number(++counter);
             }
@@ -73,13 +77,17 @@ static void do_blue_button_action() {
             break;
         case MENU_MODE:
         case SHOW_INTERVAL_MODE:
+        case SHOW_DURATION_MODE:
         case SETTINGS_MODE:
         case INTERVAL_SETTINGS_MODE:
-            set_option(false);
+        case DURATION_SETTINGS_MODE:
+            set_option(get_option() - 1);
             break;
         case INTERVAL_HOURS_SETTING_MODE:
         case INTERVAL_MINUTES_SETTING_MODE:
         case INTERVAL_SECONDS_SETTING_MODE:
+        case DURATION_MINUTES_SETTING_MODE:
+        case DURATION_SECONDS_SETTING_MODE:
             if (counter > 0) {
                 display_number(--counter);
             }
@@ -88,9 +96,10 @@ static void do_blue_button_action() {
 }
 
 static void do_both_button_action() {
+    const int8_t opt = get_option();
     switch (get_mode()) {
         case MENU_MODE:
-            switch (get_option()) {
+            switch (opt) {
                 case MENU_SHOW_INTERVAL_OPTION:
                     set_mode(SHOW_INTERVAL_MODE);
                     break;
@@ -109,7 +118,7 @@ static void do_both_button_action() {
             set_mode(MENU_MODE);
             break;
         case SETTINGS_MODE:
-            switch (get_option()) {
+            switch (opt) {
                 case SETTINGS_INTERVAL_SETTING_OPTION:
                     set_mode(INTERVAL_SETTINGS_MODE);
                     break;
@@ -121,7 +130,7 @@ static void do_both_button_action() {
             }
             break;
         case INTERVAL_SETTINGS_MODE:
-            switch (get_option()) {
+            switch (opt) {
                 case INTERVAL_SETTINGS_HOURS_OPTION:
                     set_mode(INTERVAL_HOURS_SETTING_MODE);
                     reset_and_display_counter();
@@ -139,7 +148,7 @@ static void do_both_button_action() {
             }
             break;
         case DURATION_SETTINGS_MODE:
-            switch (get_option()) {
+            switch (opt) {
                 case DURATION_SETTINGS_MINUTES_OPTION:
                     set_mode(DURATION_MINUTES_SETTING_MODE);
                     reset_and_display_counter();

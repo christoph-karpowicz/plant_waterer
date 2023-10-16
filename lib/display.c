@@ -46,8 +46,8 @@ void display_number(uint8_t number) {
         return;
     }
     
-    uint8_t left_segment = number / 10;
-    uint8_t right_segment = number % 10;
+    const uint8_t left_segment = number / 10;
+    const uint8_t right_segment = number % 10;
     display(pgm_read_word(&LEFT_DIGITS[left_segment]) 
         & pgm_read_word(&RIGHT_DIGITS[right_segment]));
 }
