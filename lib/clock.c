@@ -1,10 +1,11 @@
 #include "clock.h"
 #include "display.h"
+#include "eeprom.h"
 
 static bool timer_1_sec_mode;
 static bool sleep_mode_on;
 static bool display_greeting = 1;
-static uint32_t timer_top = 60;
+static uint32_t timer_top = MIN_TIMER_TOP;
 static uint32_t timer_seconds;
 
 static void one_second_clock_enable() {
@@ -39,9 +40,12 @@ bool is_sleeping() {
     return sleep_mode_on;
 }
 
-void set_timer_top(uint8_t interval_hours, uint8_t interval_minutes,
-                   uint8_t interval_seconds) {
-    timer_top = (interval_hours * 60 * 60) + (interval_minutes * 60) + interval_seconds;
+void set_timer_top() {
+    timer_top = (EEPROM_read(INTERVAL_HOURS_ADDRESS) * 60 * 60) + 
+        (EEPROM_read(INTERVAL_MINUTES_ADDRESS) * 60) + EEPROM_read(INTERVAL_SECONDS_ADDRESS);
+    if (timer_top < MIN_TIMER_TOP) {
+        timer_top = MIN_TIMER_TOP;
+    }
 }
 
 // main clock interrupt

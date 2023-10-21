@@ -40,7 +40,7 @@ void init_display() {
     display(HI);
 }
 
-void display_number(uint8_t number) {
+void display_number(const uint8_t number) {
     if (number > 99) {
         display(ERROR);
         return;
@@ -52,7 +52,7 @@ void display_number(uint8_t number) {
         & pgm_read_word(&RIGHT_DIGITS[right_segment]));
 }
 
-void display(uint16_t output) {
+void display(const uint16_t output) {
     SHIFT_REG_CK_PORT &= ~_BV(SHIFT_REG_RCK_PIN);
     uint8_t i;
     uint16_t mask = 0b1000000000000000;

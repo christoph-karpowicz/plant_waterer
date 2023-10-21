@@ -4,6 +4,6 @@
 #include <stdbool.h>
 
 void init_buttons();
-bool are_buttons_active();
+const bool are_buttons_active();
 
 #endif

@@ -1,14 +1,5 @@
 #include "settings.h"
 
-uint8_t interval[] = {
-    0, // hours
-    0, // minutes
-    0 // seconds
-};
-uint8_t duration[] = {
-    0, // minutes
-    0 // seconds
-};
 static uint8_t current_mode = OFF_MODE;
 static int8_t current_option;
 
@@ -83,9 +74,13 @@ void set_option(const int8_t next_option) {
     }
 
     if (current_mode == SHOW_INTERVAL_MODE) {
-        display_number(interval[current_option]);
+        display_number(EEPROM_read(current_option));
     } else if (current_mode == SHOW_DURATION_MODE) {
-        display_number(duration[current_option]);
+        if (current_option == 0) {
+            display_number(EEPROM_read(DURATION_MINUTES_ADDRESS));
+        } else {
+            display_number(EEPROM_read(DURATION_SECONDS_ADDRESS));
+        }
     } else {
         display(opt);
     }

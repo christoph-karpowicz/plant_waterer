@@ -10,6 +10,7 @@ void init() {
     init_clock_drivers();
     init_clock_interrupts();
     init_display();
+    set_timer_top();
 
     sei();
 }

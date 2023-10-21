@@ -2,6 +2,7 @@
 #include "buttons.h"
 #include "clock.h"
 #include "settings.h"
+#include "eeprom.h"
 
 #define BUTTON_STANDBY_TIMER_TOP 255
 #define BUTTONS_ACTIVE_MAX_TIME 120
@@ -35,7 +36,7 @@ void init_buttons() {
     OCR0A = 10;
 }
 
-bool are_buttons_active() {
+const bool are_buttons_active() {
     return blue_button_active || red_button_active;
 }
 
@@ -162,26 +163,26 @@ static void do_both_button_action() {
             }
             break;
         case INTERVAL_HOURS_SETTING_MODE:
-            set_interval_hours(counter);
-            set_timer_top(interval[0], interval[1], interval[2]);
+            EEPROM_write(INTERVAL_HOURS_ADDRESS, counter);
+            set_timer_top();
             set_mode(MENU_MODE);
             break;
         case INTERVAL_MINUTES_SETTING_MODE:
-            set_interval_minutes(counter);
-            set_timer_top(interval[0], interval[1], interval[2]);
+            EEPROM_write(INTERVAL_MINUTES_ADDRESS, counter);
+            set_timer_top();
             set_mode(MENU_MODE);
             break;
         case INTERVAL_SECONDS_SETTING_MODE:
-            set_interval_seconds(counter);
-            set_timer_top(interval[0], interval[1], interval[2]);
+            EEPROM_write(INTERVAL_SECONDS_ADDRESS, counter);
+            set_timer_top();
             set_mode(MENU_MODE);
             break;
         case DURATION_MINUTES_SETTING_MODE:
-            set_duration_minutes(counter);
+            EEPROM_write(DURATION_MINUTES_ADDRESS, counter);
             set_mode(MENU_MODE);
             break;
         case DURATION_SECONDS_SETTING_MODE:
-            set_duration_seconds(counter);
+            EEPROM_write(DURATION_SECONDS_ADDRESS, counter);
             set_mode(MENU_MODE);
             break;
     }

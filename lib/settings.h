@@ -5,6 +5,7 @@
 #include <avr/pgmspace.h>
 #include <stdbool.h>
 #include "display.h"
+#include "eeprom.h"
 
 #define MENU_MODE 0
 #define SHOW_INTERVAL_MODE 1
@@ -36,13 +37,6 @@
 
 #define DURATION_SETTINGS_MINUTES_OPTION 0
 #define DURATION_SETTINGS_SECONDS_OPTION 1
-
-#define set_interval_hours(hours) interval[0] = hours
-#define set_interval_minutes(minutes) interval[1] = minutes
-#define set_interval_seconds(seconds) interval[2] = seconds
-
-#define set_duration_minutes(minutes) duration[0] = minutes
-#define set_duration_seconds(seconds) duration[1] = seconds
 
 const uint8_t get_mode();
 void set_mode(const uint8_t mode);

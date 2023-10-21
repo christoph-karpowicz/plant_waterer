@@ -31,7 +31,7 @@
 #define DISPLAY_SETTINGS_SECONDS_OPTION 0b1000111111110011 // S
 
 void init_display();
-void display_number(uint8_t number);
-void display(uint16_t output);
+void display_number(const uint8_t number);
+void display(const uint16_t output);
 
 #endif
