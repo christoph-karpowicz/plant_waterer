@@ -51,38 +51,33 @@ uint16_t opts[6][3] PROGMEM = {
     }
 };
 
-uint8_t get_mode() {
+const uint8_t get_mode() {
     return current_mode;
 }
 
-void set_mode(uint8_t mode) {
+void set_mode(const uint8_t mode) {
     current_mode = mode;
 
     if (current_mode == OFF_MODE) {
         display(EMPTY);
-    } else if (current_mode == SHOW_INTERVAL_MODE) {
-        display_number(interval[0]);
-    } else if (current_mode == SHOW_DURATION_MODE) {
-        display_number(duration[0]);
     } else {
         set_option(0);
     }
 }
 
-uint8_t get_option() {
+const uint8_t get_option() {
     return current_option;
 }
 
-void set_option(int8_t next_option) {
-    const uint16_t opt = pgm_read_word(&opts[current_mode][next_option]);
-    
+void set_option(const int8_t next_option) {
     if (next_option > 3 || next_option < 0) {
         return;
     }
 
     current_option = next_option;
+    const uint16_t opt = pgm_read_word(&opts[current_mode][current_option]);
 
-    if (next_option > 2 || opt == 0) {
+    if (current_option > 2 || opt == 0) {
         display(DISPLAY_EXIT);
         return;
     }

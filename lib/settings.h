@@ -19,9 +19,9 @@
 #define DURATION_SECONDS_SETTING_MODE 10
 #define OFF_MODE 11
 
-#define DISPLAY_HOURS_OPTION 0
-#define DISPLAY_MINUTES_OPTION 1
-#define DISPLAY_SECONDS_OPTION 2
+#define DISPLAY_HOURS_OPTION 1
+#define DISPLAY_MINUTES_OPTION 2
+#define DISPLAY_SECONDS_OPTION 3
 
 #define MENU_SHOW_INTERVAL_OPTION 0
 #define MENU_SHOW_DURATION_OPTION 1
@@ -44,9 +44,9 @@
 #define set_duration_minutes(minutes) duration[0] = minutes
 #define set_duration_seconds(seconds) duration[1] = seconds
 
-uint8_t get_mode();
-void set_mode(uint8_t mode);
-uint8_t get_option();
-void set_option(int8_t next_option);
+const uint8_t get_mode();
+void set_mode(const uint8_t mode);
+const uint8_t get_option();
+void set_option(const int8_t next_option);
 
 #endif
