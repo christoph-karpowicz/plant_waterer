@@ -1,10 +1,5 @@
 #include "display.h"
 
-#define SHIFT_REG_SERIAL_PORT PORTD
-#define SHIFT_REG_SERIAL_PIN PD6
-#define SHIFT_REG_CK_PORT PORTB
-#define SHIFT_REG_SCK_PIN PB0
-#define SHIFT_REG_RCK_PIN PB1
 #define OUTPUT_PINS 16
 
 static uint16_t LEFT_DIGITS[] PROGMEM = {
@@ -31,14 +26,6 @@ static uint16_t RIGHT_DIGITS[] PROGMEM = {
     0b1000011111110001,
     0b1000111111110001
 };
-
-void init_display() {
-    DDRB |= _BV(SHIFT_REG_SCK_PIN);
-    DDRB |= _BV(SHIFT_REG_RCK_PIN);
-    DDRD |= _BV(SHIFT_REG_SERIAL_PIN);
-    
-    display(HI);
-}
 
 void display_number(const uint8_t number) {
     if (number > 99) {

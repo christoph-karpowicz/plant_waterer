@@ -1,7 +1,6 @@
 #include "i2c.h"
 
 #define I2C_DDR DDRD
-#define I2C_PIN PIND
 #define I2C_PORT PORTD
 
 #define I2C_CLK PD4

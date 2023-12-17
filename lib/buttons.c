@@ -10,31 +10,11 @@
 #define enable_timer_interrupt() TIMSK |= _BV(OCIE0A)
 #define disable_timer_interrupt() TIMSK &= ~_BV(OCIE0A)
 
-extern uint8_t interval[];
-extern uint8_t duration[];
-
 static uint8_t counter;
 static bool blue_button_active;
 static uint8_t blue_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
 static bool red_button_active;
 static uint8_t red_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
-
-void init_buttons() {
-    // blue button interrupt
-    GIMSK |= _BV(INT0);
-    MCUCR |= _BV(ISC01);
-
-    // red button interrupt
-    GIMSK |= _BV(PCIE);
-    PCMSK |= _BV(PCINT4);
-
-    // Timer divider 64 value
-    TCCR0B |= (_BV(CS00) | _BV(CS01));
-    // Timer CTC mode
-    TCCR0A |= _BV(WGM01);
-    // Timer TOP value
-    OCR0A = 10;
-}
 
 const bool are_buttons_active() {
     return blue_button_active || red_button_active;
@@ -165,24 +145,29 @@ static void do_both_button_action() {
         case INTERVAL_HOURS_SETTING_MODE:
             EEPROM_write(INTERVAL_HOURS_ADDRESS, counter);
             set_timer_top();
+            reset_timer();
             set_mode(MENU_MODE);
             break;
         case INTERVAL_MINUTES_SETTING_MODE:
             EEPROM_write(INTERVAL_MINUTES_ADDRESS, counter);
             set_timer_top();
+            reset_timer();
             set_mode(MENU_MODE);
             break;
         case INTERVAL_SECONDS_SETTING_MODE:
             EEPROM_write(INTERVAL_SECONDS_ADDRESS, counter);
             set_timer_top();
+            reset_timer();
             set_mode(MENU_MODE);
             break;
         case DURATION_MINUTES_SETTING_MODE:
             EEPROM_write(DURATION_MINUTES_ADDRESS, counter);
+            set_timer_top();
             set_mode(MENU_MODE);
             break;
         case DURATION_SECONDS_SETTING_MODE:
             EEPROM_write(DURATION_SECONDS_ADDRESS, counter);
+            set_timer_top();
             set_mode(MENU_MODE);
             break;
     }

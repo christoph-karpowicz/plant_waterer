@@ -4,6 +4,12 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 
+#define SHIFT_REG_SERIAL_PORT PORTD
+#define SHIFT_REG_SERIAL_PIN PD6
+#define SHIFT_REG_CK_PORT PORTB
+#define SHIFT_REG_SCK_PIN PB0
+#define SHIFT_REG_RCK_PIN PB1
+
 /*
     10             13
    ___            ___
@@ -30,7 +36,6 @@
 #define DISPLAY_SETTINGS_MINUTES_OPTION 0b1011111101000000 // M
 #define DISPLAY_SETTINGS_SECONDS_OPTION 0b1000111111110011 // S
 
-void init_display();
 void display_number(const uint8_t number);
 void display(const uint16_t output);
 
