@@ -22,9 +22,6 @@ void init() {
     // Timer TOP value
     OCR0A = 10;
     
-    // init clock drivers
-    DDRB |= (_BV(PB2) | _BV(PB3));
-
     // init pump driver
     DDRA |= _BV(PA0);
 
@@ -37,6 +34,8 @@ void init() {
     DDRB |= _BV(SHIFT_REG_RCK_PIN);
     DDRD |= _BV(SHIFT_REG_SERIAL_PIN);
     display(HI);
+
+    set_duration();
 
     sei();
 }

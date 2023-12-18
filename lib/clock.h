@@ -9,5 +9,6 @@ void wake_up();
 bool is_sleeping();
 void reset_timer();
 void set_timer_top();
+void set_duration();
 
 #endif

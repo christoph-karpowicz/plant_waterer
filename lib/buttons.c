@@ -36,12 +36,12 @@ static void do_red_button_action() {
             set_option(get_option() + 1);
             break;
         case INTERVAL_HOURS_SETTING_MODE:
-            if (counter < 99) {
+            if (counter < 24) {
                 display_number(++counter);
             }
             break;
+        case INTERVAL_DAYS_SETTING_MODE:
         case INTERVAL_MINUTES_SETTING_MODE:
-        case INTERVAL_SECONDS_SETTING_MODE:
         case DURATION_MINUTES_SETTING_MODE:
         case DURATION_SECONDS_SETTING_MODE:
             if (counter < 60) {
@@ -64,9 +64,9 @@ static void do_blue_button_action() {
         case DURATION_SETTINGS_MODE:
             set_option(get_option() - 1);
             break;
+        case INTERVAL_DAYS_SETTING_MODE:
         case INTERVAL_HOURS_SETTING_MODE:
         case INTERVAL_MINUTES_SETTING_MODE:
-        case INTERVAL_SECONDS_SETTING_MODE:
         case DURATION_MINUTES_SETTING_MODE:
         case DURATION_SECONDS_SETTING_MODE:
             if (counter > 0) {
@@ -112,16 +112,16 @@ static void do_both_button_action() {
             break;
         case INTERVAL_SETTINGS_MODE:
             switch (opt) {
+                case INTERVAL_SETTINGS_DAYS_OPTION:
+                    set_mode(INTERVAL_DAYS_SETTING_MODE);
+                    reset_and_display_counter();
+                    break;
                 case INTERVAL_SETTINGS_HOURS_OPTION:
                     set_mode(INTERVAL_HOURS_SETTING_MODE);
                     reset_and_display_counter();
                     break;
                 case INTERVAL_SETTINGS_MINUTES_OPTION:
                     set_mode(INTERVAL_MINUTES_SETTING_MODE);
-                    reset_and_display_counter();
-                    break;
-                case INTERVAL_SETTINGS_SECONDS_OPTION:
-                    set_mode(INTERVAL_SECONDS_SETTING_MODE);
                     reset_and_display_counter();
                     break;
                 default:
@@ -142,6 +142,12 @@ static void do_both_button_action() {
                     set_mode(SETTINGS_MODE);
             }
             break;
+        case INTERVAL_DAYS_SETTING_MODE:
+            EEPROM_write(INTERVAL_DAYS_ADDRESS, counter);
+            set_timer_top();
+            reset_timer();
+            set_mode(MENU_MODE);
+            break;
         case INTERVAL_HOURS_SETTING_MODE:
             EEPROM_write(INTERVAL_HOURS_ADDRESS, counter);
             set_timer_top();
@@ -154,20 +160,14 @@ static void do_both_button_action() {
             reset_timer();
             set_mode(MENU_MODE);
             break;
-        case INTERVAL_SECONDS_SETTING_MODE:
-            EEPROM_write(INTERVAL_SECONDS_ADDRESS, counter);
-            set_timer_top();
-            reset_timer();
-            set_mode(MENU_MODE);
-            break;
         case DURATION_MINUTES_SETTING_MODE:
             EEPROM_write(DURATION_MINUTES_ADDRESS, counter);
-            set_timer_top();
+            set_duration();
             set_mode(MENU_MODE);
             break;
         case DURATION_SECONDS_SETTING_MODE:
             EEPROM_write(DURATION_SECONDS_ADDRESS, counter);
-            set_timer_top();
+            set_duration();
             set_mode(MENU_MODE);
             break;
     }
