@@ -1,6 +1,7 @@
 #include "clock.h"
 #include "display.h"
 #include "eeprom.h"
+#include "pump.h"
 
 #define MIN_TIMER_TOP 30
 #define MIN_DURATION 10
@@ -13,16 +14,8 @@
 #define DAYS_TO_SECONDS(d)\
 (d * 24 * 60 * 60)
 
-#define START_PUMP()\
-pump_on = true;\
-PORTA |= _BV(PA0);
-#define STOP_PUMP()\
-pump_on = false;\
-PORTA &= ~_BV(PA0);
-
+static bool greeting_on = true;
 static bool sleep_mode_on;
-static bool pump_on;
-static bool display_greeting = true;
 static uint32_t timer_top = MIN_TIMER_TOP;
 static uint16_t duration = MIN_DURATION;
 static uint32_t timer_seconds;
@@ -67,22 +60,20 @@ void set_duration() {
 ISR(INT1_vect) {
     timer_seconds++;
     
-    if (!pump_on) {
-        if (display_greeting) {
-            display(EMPTY);
-            display_greeting = 0;
-        }
-        
+    if (!is_pump_on()) {
         if (timer_top < timer_seconds) {
             display(DOTS);
             reset_timer();
-            START_PUMP();
+            start_pump();
         } else if (timer_top - TIMER_COUNTDOWN_TOP <= timer_seconds) {
             display_number(timer_top - timer_seconds);
+        } else if (greeting_on && timer_seconds >= 3) {
+            display(EMPTY);
+            greeting_on = false;
         }
     } else {
         if (timer_seconds > duration) {
-            STOP_PUMP();
+            stop_pump();
             display(EMPTY);
         }
     }

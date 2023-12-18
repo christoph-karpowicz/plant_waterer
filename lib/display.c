@@ -8,11 +8,7 @@ static uint16_t LEFT_DIGITS[] PROGMEM = {
     0b1111111010001110,
     0b1111110010001111,
     0b1111110100101111,
-    0b1111110000011111,
-    0b1111110000011110,
-    0b1111110111001111,
-    0b1111110000001110,
-    0b1111110000001111
+    0b1111110000011111
 };
 static uint16_t RIGHT_DIGITS[] PROGMEM = {
     0b1010011111110001,
@@ -28,7 +24,7 @@ static uint16_t RIGHT_DIGITS[] PROGMEM = {
 };
 
 void display_number(const uint8_t number) {
-    if (number > 99) {
+    if (number > 59) {
         display(ERROR);
         return;
     }

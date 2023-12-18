@@ -3,21 +3,25 @@
 #include "clock.h"
 #include "settings.h"
 #include "eeprom.h"
+#include "pump.h"
 
 #define BUTTON_STANDBY_TIMER_TOP 255
 #define BUTTONS_ACTIVE_MAX_TIME 120
+#define BLUE_BUTTON_ACTIVE_BIT 7
+#define RED_BUTTON_ACTIVE_BIT 6
 
 #define enable_timer_interrupt() TIMSK |= _BV(OCIE0A)
 #define disable_timer_interrupt() TIMSK &= ~_BV(OCIE0A)
 
+// 0b10000000 - blue button active
+// 0b01000000 - red button active
+static uint8_t button_active_flags = 0;
 static uint8_t counter;
-static bool blue_button_active;
 static uint8_t blue_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
-static bool red_button_active;
 static uint8_t red_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
 
 const bool are_buttons_active() {
-    return blue_button_active || red_button_active;
+    return button_active_flags;
 }
 
 static void reset_and_display_counter() {
@@ -36,7 +40,7 @@ static void do_red_button_action() {
             set_option(get_option() + 1);
             break;
         case INTERVAL_HOURS_SETTING_MODE:
-            if (counter < 24) {
+            if (counter < 23) {
                 display_number(++counter);
             }
             break;
@@ -44,7 +48,7 @@ static void do_red_button_action() {
         case INTERVAL_MINUTES_SETTING_MODE:
         case DURATION_MINUTES_SETTING_MODE:
         case DURATION_SECONDS_SETTING_MODE:
-            if (counter < 60) {
+            if (counter < 59) {
                 display_number(++counter);
             }
             break;
@@ -174,36 +178,38 @@ static void do_both_button_action() {
 }
 
 static void reset_buttons() {
-    red_button_active = false;
-    blue_button_active = false;
+    button_active_flags = 0;
     blue_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
     red_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
 }
 
-static void handle_button_press(uint8_t *button_wait_timer, uint8_t *button_active) {
+static void handle_button_press(uint8_t *button_wait_timer, uint8_t button_active) {
+    if (is_pump_on()) {
+        stop_pump();
+    }
     wake_up();
     if (*button_wait_timer >= BUTTON_STANDBY_TIMER_TOP) {
         enable_timer_interrupt();
         *button_wait_timer = 0;
-        *button_active = 1;
+        button_active_flags |= _BV(button_active);
     }
 }
 
-static void handle_button_timer_interrupt(uint8_t *button_wait_timer, uint8_t *button_active,
+static void handle_button_timer_interrupt(uint8_t *button_wait_timer, uint8_t button_active,
                                           void (*action_func)()) {
-    if (!(*button_active)) {
+    if (!(button_active_flags & _BV(button_active))) {
         return;
     }
     (*button_wait_timer)++;
     if (*button_wait_timer >= BUTTON_STANDBY_TIMER_TOP) {
-        if (blue_button_active && red_button_active) {
+        if (button_active_flags == 0b11000000) {
             do_both_button_action();
             reset_buttons();
         } else {
             (*action_func)();
-            *button_active = 0;
+            button_active_flags &= ~_BV(button_active);
         }
-        if (!blue_button_active && !red_button_active) {
+        if (!are_buttons_active()) {
             disable_timer_interrupt();
         }
     }
@@ -211,16 +217,16 @@ static void handle_button_timer_interrupt(uint8_t *button_wait_timer, uint8_t *b
 
 // blue button pressed
 ISR(INT0_vect) {
-    handle_button_press(&blue_button_wait_timer, &blue_button_active);
+    handle_button_press(&blue_button_wait_timer, BLUE_BUTTON_ACTIVE_BIT);
 }
 
 // red button pressed
 ISR(PCINT_B_vect) {
-    handle_button_press(&red_button_wait_timer, &red_button_active);
+    handle_button_press(&red_button_wait_timer, RED_BUTTON_ACTIVE_BIT);
 }
 
 // button timer interrupt
 ISR(TIMER0_COMPA_vect) {
-    handle_button_timer_interrupt(&blue_button_wait_timer, &blue_button_active, &do_blue_button_action);
-    handle_button_timer_interrupt(&red_button_wait_timer, &red_button_active, &do_red_button_action);
+    handle_button_timer_interrupt(&blue_button_wait_timer, BLUE_BUTTON_ACTIVE_BIT, &do_blue_button_action);
+    handle_button_timer_interrupt(&red_button_wait_timer, RED_BUTTON_ACTIVE_BIT, &do_red_button_action);
 }
