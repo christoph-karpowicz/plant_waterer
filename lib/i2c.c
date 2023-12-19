@@ -33,7 +33,7 @@ static void I2C_ack() {
 }
 
 // Send single bit on data
-static void I2C_write_data(uint8_t data) {
+static void I2C_write_data(const uint8_t data) {
     if (data > 0) {
         I2C_DATA_HIGH();
     } else {
@@ -104,7 +104,7 @@ static void I2C_stop() {
     delay();
 }
 
-static void I2C_send(uint8_t addr, uint8_t data) {
+static void I2C_send(const uint8_t addr, const uint8_t data) {
     I2C_start();
     I2C_write(DS1307_W);
     I2C_write(addr);

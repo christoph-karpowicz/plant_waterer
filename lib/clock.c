@@ -3,7 +3,7 @@
 #include "eeprom.h"
 #include "pump.h"
 
-#define MIN_TIMER_TOP 30
+#define MIN_TIMER_TOP 20
 #define MIN_DURATION 10
 #define TIMER_COUNTDOWN_TOP 10
 
@@ -14,7 +14,6 @@
 #define DAYS_TO_SECONDS(d)\
 (d * 24 * 60 * 60)
 
-static bool greeting_on = true;
 static bool sleep_mode_on;
 static uint32_t timer_top = MIN_TIMER_TOP;
 static uint16_t duration = MIN_DURATION;
@@ -41,9 +40,10 @@ bool is_sleeping() {
 void set_timer_top() {
     timer_top = DAYS_TO_SECONDS(EEPROM_read(INTERVAL_DAYS_ADDRESS))
         + HOURS_TO_SECONDS(EEPROM_read(INTERVAL_HOURS_ADDRESS))
-        + MINUTES_TO_SECONDS(EEPROM_read(INTERVAL_MINUTES_ADDRESS));
+        + MINUTES_TO_SECONDS(EEPROM_read(INTERVAL_MINUTES_ADDRESS))
+        - TIMER_COUNTDOWN_TOP;
     if (timer_top < duration + TIMER_COUNTDOWN_TOP) {
-        timer_top = duration + TIMER_COUNTDOWN_TOP;
+        timer_top = duration;
     }
 }
 
@@ -59,24 +59,33 @@ void set_duration() {
 // main clock interrupt
 ISR(INT1_vect) {
     timer_seconds++;
-    
+
     if (!is_pump_on()) {
-        if (timer_top < timer_seconds) {
+        if (timer_top > timer_seconds) {
+            goto end;
+        }
+        
+        const uint32_t actual_timer_top = timer_top + TIMER_COUNTDOWN_TOP;
+        if (actual_timer_top < timer_seconds) {
             display(DOTS);
             reset_timer();
             start_pump();
-        } else if (timer_top - TIMER_COUNTDOWN_TOP <= timer_seconds) {
-            display_number(timer_top - timer_seconds);
-        } else if (greeting_on && timer_seconds >= 3) {
-            display(EMPTY);
-            greeting_on = false;
+        } else if (timer_top <= timer_seconds) {
+            display_number(actual_timer_top - timer_seconds);
         }
     } else {
         if (timer_seconds > duration) {
             stop_pump();
             display(EMPTY);
+        } else {
+            if (timer_seconds % 2 == 0) {
+                display(LEFT_DOT);
+            } else {
+                display(RIGHT_DOT);
+            }
         }
     }
 
+end:
     sleep();
 }
