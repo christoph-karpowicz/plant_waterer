@@ -1,7 +1,7 @@
 #include "settings.h"
 
 static uint8_t current_mode = OFF_MODE;
-static int8_t current_option;
+static uint8_t current_option;
 
 uint16_t opts[6][3] PROGMEM = {
     // MENU_MODE
@@ -60,13 +60,13 @@ const uint8_t get_option() {
     return current_option;
 }
 
-void set_option(const int8_t next_option) {
-    if (next_option > 3 || next_option < 0) {
+void set_option(const uint8_t next_option) {
+    if (next_option > 3) {
         return;
     }
 
     current_option = next_option;
-    const uint16_t opt = pgm_read_word(&opts[current_mode][current_option]);
+    const uint16_t opt = pgm_read_word(&opts[current_mode - MENU_MODE_OFFSET][current_option]);
 
     if (current_option > 2 || opt == 0) {
         display(DISPLAY_EXIT);
@@ -76,11 +76,7 @@ void set_option(const int8_t next_option) {
     if (current_mode == SHOW_INTERVAL_MODE) {
         display_number(EEPROM_read(current_option));
     } else if (current_mode == SHOW_DURATION_MODE) {
-        if (current_option == 0) {
-            display_number(EEPROM_read(DURATION_MINUTES_ADDRESS));
-        } else {
-            display_number(EEPROM_read(DURATION_SECONDS_ADDRESS));
-        }
+        display_number(EEPROM_read(current_option + DURATION_EEPROM_OFFSET));
     } else {
         display(opt);
     }

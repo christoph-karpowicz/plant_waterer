@@ -9,7 +9,7 @@
 #define DURATION_MINUTES_ADDRESS 3
 #define DURATION_SECONDS_ADDRESS 4
 
-void EEPROM_write(uint8_t ucAddress, uint8_t ucData);
-uint8_t EEPROM_read(uint8_t ucAddress);
+void EEPROM_write(const uint8_t ucAddress, const uint8_t ucData);
+const uint8_t EEPROM_read(const uint8_t ucAddress);
 
 #endif

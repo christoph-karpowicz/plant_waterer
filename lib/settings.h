@@ -7,17 +7,20 @@
 #include "display.h"
 #include "eeprom.h"
 
-#define MENU_MODE 0
-#define SHOW_INTERVAL_MODE 1
-#define SHOW_DURATION_MODE 2
-#define SETTINGS_MODE 3
-#define INTERVAL_SETTINGS_MODE 4
-#define DURATION_SETTINGS_MODE 5
-#define INTERVAL_DAYS_SETTING_MODE 6
-#define INTERVAL_HOURS_SETTING_MODE 7
-#define INTERVAL_MINUTES_SETTING_MODE 8
-#define DURATION_MINUTES_SETTING_MODE 9
-#define DURATION_SECONDS_SETTING_MODE 10
+#define MENU_MODE_OFFSET 5
+#define DURATION_EEPROM_OFFSET 3
+
+#define INTERVAL_DAYS_SETTING_MODE 0
+#define INTERVAL_HOURS_SETTING_MODE 1
+#define INTERVAL_MINUTES_SETTING_MODE 2
+#define DURATION_MINUTES_SETTING_MODE 3
+#define DURATION_SECONDS_SETTING_MODE 4
+#define MENU_MODE 5
+#define SHOW_INTERVAL_MODE 6
+#define SHOW_DURATION_MODE 7
+#define SETTINGS_MODE 8
+#define INTERVAL_SETTINGS_MODE 9
+#define DURATION_SETTINGS_MODE 10
 #define OFF_MODE 11
 
 #define DISPLAY_DAYS_OPTION 1
@@ -42,6 +45,6 @@
 const uint8_t get_mode();
 void set_mode(const uint8_t mode);
 const uint8_t get_option();
-void set_option(const int8_t next_option);
+void set_option(const uint8_t next_option);
 
 #endif

@@ -25,8 +25,19 @@ static void sleep() {
     }
 }
 
-void reset_timer() {
+static void reset_timer() {
     timer_seconds = 0;
+}
+
+static void set_timer_top() {
+    timer_top = DAYS_TO_SECONDS(EEPROM_read(INTERVAL_DAYS_ADDRESS))
+        + HOURS_TO_SECONDS(EEPROM_read(INTERVAL_HOURS_ADDRESS))
+        + MINUTES_TO_SECONDS(EEPROM_read(INTERVAL_MINUTES_ADDRESS))
+        - TIMER_COUNTDOWN_TOP;
+    if (timer_top < duration + TIMER_COUNTDOWN_TOP) {
+        timer_top = duration;
+    }
+    reset_timer();
 }
 
 void wake_up() {
@@ -37,17 +48,7 @@ bool is_sleeping() {
     return sleep_mode_on;
 }
 
-void set_timer_top() {
-    timer_top = DAYS_TO_SECONDS(EEPROM_read(INTERVAL_DAYS_ADDRESS))
-        + HOURS_TO_SECONDS(EEPROM_read(INTERVAL_HOURS_ADDRESS))
-        + MINUTES_TO_SECONDS(EEPROM_read(INTERVAL_MINUTES_ADDRESS))
-        - TIMER_COUNTDOWN_TOP;
-    if (timer_top < duration + TIMER_COUNTDOWN_TOP) {
-        timer_top = duration;
-    }
-}
-
-void set_duration() {
+void set_duration_and_timer_top() {
     duration = (MINUTES_TO_SECONDS(EEPROM_read(DURATION_MINUTES_ADDRESS))) 
         + EEPROM_read(DURATION_SECONDS_ADDRESS);
     if (duration < MIN_DURATION) {
