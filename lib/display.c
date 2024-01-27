@@ -24,11 +24,6 @@ static uint16_t RIGHT_DIGITS[] PROGMEM = {
 };
 
 void display_number(const uint8_t number) {
-    if (number > 59) {
-        display(ERROR);
-        return;
-    }
-    
     const uint8_t left_segment = number / 10;
     const uint8_t right_segment = number % 10;
     display(pgm_read_word(&LEFT_DIGITS[left_segment]) 

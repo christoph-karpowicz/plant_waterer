@@ -3,7 +3,6 @@
 #include "clock.h"
 #include "settings.h"
 #include "eeprom.h"
-#include "pump.h"
 
 #define BUTTON_STANDBY_TIMER_TOP 255
 #define BUTTONS_ACTIVE_MAX_TIME 120
@@ -12,6 +11,9 @@
 
 #define enable_timer_interrupt() TIMSK |= _BV(OCIE0A)
 #define disable_timer_interrupt() TIMSK &= ~_BV(OCIE0A)
+
+extern uint8_t current_mode;
+extern uint8_t current_option;
 
 // 0b10000000 - blue button active
 // 0b01000000 - red button active
@@ -30,14 +32,14 @@ static void reset_and_display_counter() {
 }
 
 static void do_red_button_action() {
-    switch (get_mode()) {
+    switch (current_mode) {
         case MENU_MODE:
         case SHOW_INTERVAL_MODE:
         case SHOW_DURATION_MODE:
         case SETTINGS_MODE:
         case INTERVAL_SETTINGS_MODE:
         case DURATION_SETTINGS_MODE:
-            set_option(get_option() + 1);
+            set_option(current_option + 1);
             break;
         case INTERVAL_HOURS_SETTING_MODE:
             if (counter < 23) {
@@ -56,7 +58,7 @@ static void do_red_button_action() {
 }
 
 static void do_blue_button_action() {
-    switch (get_mode()) {
+    switch (current_mode) {
         case OFF_MODE:
             set_mode(MENU_MODE);
             break;
@@ -66,7 +68,7 @@ static void do_blue_button_action() {
         case SETTINGS_MODE:
         case INTERVAL_SETTINGS_MODE:
         case DURATION_SETTINGS_MODE:
-            set_option(get_option() - 1);
+            set_option(current_option - 1);
             break;
         case INTERVAL_DAYS_SETTING_MODE:
         case INTERVAL_HOURS_SETTING_MODE:
@@ -81,8 +83,8 @@ static void do_blue_button_action() {
 }
 
 static void do_both_button_action() {
-    const int8_t opt = get_option();
-    switch (get_mode()) {
+    const int8_t opt = current_option;
+    switch (current_mode) {
         case MENU_MODE:
             if (opt == MENU_SHOW_INTERVAL_OPTION) {
                 set_mode(SHOW_INTERVAL_MODE);
@@ -108,21 +110,17 @@ static void do_both_button_action() {
             }
             break;
         case INTERVAL_SETTINGS_MODE:
-            switch (opt) {
-                case INTERVAL_SETTINGS_DAYS_OPTION:
-                    set_mode(INTERVAL_DAYS_SETTING_MODE);
-                    reset_and_display_counter();
-                    break;
-                case INTERVAL_SETTINGS_HOURS_OPTION:
-                    set_mode(INTERVAL_HOURS_SETTING_MODE);
-                    reset_and_display_counter();
-                    break;
-                case INTERVAL_SETTINGS_MINUTES_OPTION:
-                    set_mode(INTERVAL_MINUTES_SETTING_MODE);
-                    reset_and_display_counter();
-                    break;
-                default:
-                    set_mode(SETTINGS_MODE);
+            if (opt == INTERVAL_SETTINGS_DAYS_OPTION) {
+                set_mode(INTERVAL_DAYS_SETTING_MODE);
+                reset_and_display_counter();
+            } else if (opt == INTERVAL_SETTINGS_HOURS_OPTION) {
+                set_mode(INTERVAL_HOURS_SETTING_MODE);
+                reset_and_display_counter();
+            } else if (opt == INTERVAL_SETTINGS_MINUTES_OPTION) {
+                set_mode(INTERVAL_MINUTES_SETTING_MODE);
+                reset_and_display_counter();
+            } else {
+                set_mode(SETTINGS_MODE);
             }
             break;
         case DURATION_SETTINGS_MODE:
@@ -142,7 +140,7 @@ static void do_both_button_action() {
         case DURATION_MINUTES_SETTING_MODE:
         case DURATION_SECONDS_SETTING_MODE:
             // EEPROM addresses are aligned with mode numbers
-            EEPROM_write(get_mode(), counter);
+            EEPROM_write(current_mode, counter);
             set_duration_and_timer_top();
             set_mode(MENU_MODE);
             break;
@@ -156,8 +154,8 @@ static void reset_buttons() {
 }
 
 static void handle_button_press(uint8_t *button_wait_timer, uint8_t button_active) {
-    if (is_pump_on()) {
-        stop_pump();
+    if (PINA & _BV(PA0)) {
+        PORTA &= ~_BV(PA0); // stop pump
         set_mode(OFF_MODE);
         return;
     }

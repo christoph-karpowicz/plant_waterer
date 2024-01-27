@@ -1,7 +1,7 @@
 #include "settings.h"
 
-static uint8_t current_mode = OFF_MODE;
-static uint8_t current_option;
+uint8_t current_mode = OFF_MODE;
+uint8_t current_option;
 
 uint16_t opts[6][3] PROGMEM = {
     // MENU_MODE
@@ -42,10 +42,6 @@ uint16_t opts[6][3] PROGMEM = {
     }
 };
 
-const uint8_t get_mode() {
-    return current_mode;
-}
-
 void set_mode(const uint8_t mode) {
     current_mode = mode;
 
@@ -54,10 +50,6 @@ void set_mode(const uint8_t mode) {
     } else {
         set_option(0);
     }
-}
-
-const uint8_t get_option() {
-    return current_option;
 }
 
 void set_option(const uint8_t next_option) {

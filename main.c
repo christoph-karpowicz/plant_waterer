@@ -9,7 +9,6 @@ void init() {
     // init display
     DDRB |= _BV(SHIFT_REG_SCK_PIN) | _BV(SHIFT_REG_RCK_PIN);
     DDRD |= _BV(SHIFT_REG_SERIAL_PIN);
-    display(HI);
 
     // disable watchdog
     wdt_disable();
@@ -46,7 +45,6 @@ void init() {
 
     set_duration_and_timer_top();
 
-    _delay_ms(1000);
     display(EMPTY);
     sei();
 }

@@ -20,11 +20,7 @@
     7              3 
 */
 #define EMPTY 0b1111111111111111
-#define HI 0b0111010100100110
-#define ERROR 0b1001011000010000
 #define DOTS 0b0111101111111111
-#define LEFT_DOT 0b1111101111111111
-#define RIGHT_DOT 0b0111111111111111
                                         //  _
 #define DISPLAY_EXIT 0b1010111001011000 // |_|
 

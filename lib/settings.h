@@ -42,9 +42,7 @@
 #define DURATION_SETTINGS_MINUTES_OPTION 0
 #define DURATION_SETTINGS_SECONDS_OPTION 1
 
-const uint8_t get_mode();
 void set_mode(const uint8_t mode);
-const uint8_t get_option();
 void set_option(const uint8_t next_option);
 
 #endif

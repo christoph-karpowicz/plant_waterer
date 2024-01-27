@@ -1,7 +1,6 @@
 #include "clock.h"
 #include "display.h"
 #include "eeprom.h"
-#include "pump.h"
 
 #define MIN_TIMER_TOP 20
 #define MIN_DURATION 10
@@ -17,7 +16,7 @@
 static bool sleep_mode_on;
 static uint32_t timer_top = MIN_TIMER_TOP;
 static uint16_t duration = MIN_DURATION;
-static uint32_t timer_seconds;
+static volatile uint32_t timer_seconds;
 
 static void sleep() {
     if (!are_buttons_active()) {
@@ -61,30 +60,22 @@ void set_duration_and_timer_top() {
 ISR(INT1_vect) {
     timer_seconds++;
 
-    if (!is_pump_on()) {
+    if (!(PINA & _BV(PA0))) { // is pump on
         if (timer_top > timer_seconds) {
             goto end;
         }
         
         const uint32_t actual_timer_top = timer_top + TIMER_COUNTDOWN_TOP;
         if (actual_timer_top < timer_seconds) {
-            display(DOTS);
             reset_timer();
-            start_pump();
+            PORTA |= _BV(PA0); // start pump
+            display(DOTS);
         } else if (timer_top <= timer_seconds) {
             display_number(actual_timer_top - timer_seconds);
         }
-    } else {
-        if (timer_seconds > duration) {
-            stop_pump();
-            display(EMPTY);
-        } else {
-            if (timer_seconds % 2 == 0) {
-                display(LEFT_DOT);
-            } else {
-                display(RIGHT_DOT);
-            }
-        }
+    } else if (timer_seconds > duration) {
+        PORTA &= ~_BV(PA0); // stop pump
+        display(EMPTY);
     }
 
 end:
