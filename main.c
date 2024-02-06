@@ -5,6 +5,8 @@
 #include <util/delay.h>
 #include "lib/clock.h"
 
+extern bool sleep_mode_on;
+
 void init() {
     // init display
     DDRB |= _BV(SHIFT_REG_SCK_PIN) | _BV(SHIFT_REG_RCK_PIN);
@@ -53,7 +55,7 @@ int main(void) {
     init();
     set_sleep_mode(SLEEP_MODE_IDLE);
     while (1) {
-        if (is_sleeping()) {
+        if (sleep_mode_on) {
             sleep_enable();
             sleep_cpu();
             sleep_disable();

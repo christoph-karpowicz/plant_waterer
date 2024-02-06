@@ -14,6 +14,7 @@
 
 extern uint8_t current_mode;
 extern uint8_t current_option;
+extern bool sleep_mode_on;
 
 // 0b10000000 - blue button active
 // 0b01000000 - red button active
@@ -154,7 +155,7 @@ static void reset_buttons() {
 }
 
 static void handle_button_press(uint8_t *button_wait_timer, uint8_t button_active) {
-    if (PINA & _BV(PA0)) {
+    if (PINA & _BV(PA0)) { // is pump on
         PORTA &= ~_BV(PA0); // stop pump
         set_mode(OFF_MODE);
         return;

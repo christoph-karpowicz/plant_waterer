@@ -5,8 +5,8 @@
 #include <avr/interrupt.h>
 #include <stdbool.h>
 
-void wake_up();
-bool is_sleeping();
+#define wake_up() sleep_mode_on = false
+
 void set_duration_and_timer_top();
 
 #endif
