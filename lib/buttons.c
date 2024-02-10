@@ -18,14 +18,11 @@ extern bool sleep_mode_on;
 
 // 0b10000000 - blue button active
 // 0b01000000 - red button active
-static uint8_t button_active_flags = 0;
+uint8_t button_active_flags = 0;
+
 static uint8_t counter;
 static uint8_t blue_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
 static uint8_t red_button_wait_timer = BUTTON_STANDBY_TIMER_TOP;
-
-const bool are_buttons_active() {
-    return button_active_flags;
-}
 
 static void reset_and_display_counter() {
     counter = 0;
@@ -37,6 +34,7 @@ static void do_red_button_action() {
         case MENU_MODE:
         case SHOW_INTERVAL_MODE:
         case SHOW_DURATION_MODE:
+        case SHOW_TIME_LEFT_MODE:
         case SETTINGS_MODE:
         case INTERVAL_SETTINGS_MODE:
         case DURATION_SETTINGS_MODE:
@@ -66,6 +64,7 @@ static void do_blue_button_action() {
         case MENU_MODE:
         case SHOW_INTERVAL_MODE:
         case SHOW_DURATION_MODE:
+        case SHOW_TIME_LEFT_MODE:
         case SETTINGS_MODE:
         case INTERVAL_SETTINGS_MODE:
         case DURATION_SETTINGS_MODE:
@@ -91,6 +90,8 @@ static void do_both_button_action() {
                 set_mode(SHOW_INTERVAL_MODE);
             } else if (opt == MENU_SHOW_DURATION_OPTION) {
                 set_mode(SHOW_DURATION_MODE);
+            } else if (opt == MENU_SHOW_TIME_LEFT_OPTION) {
+                set_mode(SHOW_TIME_LEFT_MODE);
             } else if (opt == MENU_SETTINGS_OPTION) {
                 set_mode(SETTINGS_MODE);
             } else {
@@ -99,6 +100,7 @@ static void do_both_button_action() {
             break;
         case SHOW_INTERVAL_MODE:
         case SHOW_DURATION_MODE:
+        case SHOW_TIME_LEFT_MODE:
             set_mode(MENU_MODE);
             break;
         case SETTINGS_MODE:
@@ -175,14 +177,14 @@ static void handle_button_timer_interrupt(uint8_t *button_wait_timer, uint8_t bu
     }
     (*button_wait_timer)++;
     if (*button_wait_timer >= BUTTON_STANDBY_TIMER_TOP) {
-        if (button_active_flags == 0b11000000) {
+        if (are_both_buttons_active()) {
             do_both_button_action();
             reset_buttons();
         } else {
             (*action_func)();
             button_active_flags &= ~_BV(button_active);
         }
-        if (!are_buttons_active()) {
+        if (are_buttons_inctive()) {
             disable_timer_interrupt();
         }
     }

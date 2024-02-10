@@ -3,9 +3,6 @@
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
-#include <stdbool.h>
-#include "display.h"
-#include "eeprom.h"
 
 #define MENU_MODE_OFFSET 5
 #define DURATION_EEPROM_OFFSET 3
@@ -18,10 +15,11 @@
 #define MENU_MODE 5
 #define SHOW_INTERVAL_MODE 6
 #define SHOW_DURATION_MODE 7
-#define SETTINGS_MODE 8
-#define INTERVAL_SETTINGS_MODE 9
-#define DURATION_SETTINGS_MODE 10
-#define OFF_MODE 11
+#define SHOW_TIME_LEFT_MODE 8
+#define SETTINGS_MODE 9
+#define INTERVAL_SETTINGS_MODE 10
+#define DURATION_SETTINGS_MODE 11
+#define OFF_MODE 12
 
 #define DISPLAY_DAYS_OPTION 1
 #define DISPLAY_HOURS_OPTION 2
@@ -30,7 +28,8 @@
 
 #define MENU_SHOW_INTERVAL_OPTION 0
 #define MENU_SHOW_DURATION_OPTION 1
-#define MENU_SETTINGS_OPTION 2
+#define MENU_SHOW_TIME_LEFT_OPTION 2
+#define MENU_SETTINGS_OPTION 3
 
 #define SETTINGS_INTERVAL_SETTING_OPTION 0
 #define SETTINGS_DURATION_SETTING_OPTION 1
