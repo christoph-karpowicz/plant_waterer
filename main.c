@@ -47,6 +47,8 @@ void init() {
 
     set_duration_and_timer_top();
 
+    display(HI);
+    _delay_ms(1000);
     display(EMPTY);
     sei();
 }

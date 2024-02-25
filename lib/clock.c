@@ -10,7 +10,7 @@ extern uint8_t button_active_flags;
 
 volatile bool sleep_mode_on;
 static volatile uint16_t timer_minutes;
-static volatile uint8_t timer_seconds = 60;
+static volatile int8_t timer_seconds = 60;
 
 static volatile uint16_t duration = MIN_DURATION;
 
@@ -50,7 +50,7 @@ void set_duration_and_timer_top() {
 
 // main clock interrupt
 ISR(INT1_vect) {
-    if (--timer_seconds == 0) {
+    if (--timer_seconds <= 0) {
         --timer_minutes;
         timer_seconds = 60;
     }

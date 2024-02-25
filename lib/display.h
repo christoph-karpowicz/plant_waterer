@@ -21,6 +21,7 @@
 */
 #define EMPTY 0b1111111111111111
 #define DOTS 0b0111101111111111
+#define HI 0b0111010100100110
                                         //  _
 #define DISPLAY_EXIT 0b1010111001011000 // |_|
 

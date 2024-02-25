@@ -40,12 +40,16 @@ static void do_red_button_action() {
         case DURATION_SETTINGS_MODE:
             set_option(current_option + 1);
             break;
+        case INTERVAL_DAYS_SETTING_MODE:
+            if (counter < 45) {
+                display_number(++counter);
+            }
+            break;
         case INTERVAL_HOURS_SETTING_MODE:
             if (counter < 23) {
                 display_number(++counter);
             }
             break;
-        case INTERVAL_DAYS_SETTING_MODE:
         case INTERVAL_MINUTES_SETTING_MODE:
         case DURATION_MINUTES_SETTING_MODE:
         case DURATION_SECONDS_SETTING_MODE:
