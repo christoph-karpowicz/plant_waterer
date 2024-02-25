@@ -63,8 +63,12 @@ void set_mode(const uint8_t mode) {
 
     if (current_mode == OFF_MODE) {
         display(EMPTY);
+        // enable battery indicator
+        PORTB &= ~_BV(PB2);
     } else {
         set_option(0);
+        // disable battery indicator
+        PORTB |= _BV(PB2);
     }
 }
 

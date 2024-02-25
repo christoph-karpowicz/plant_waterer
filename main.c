@@ -18,7 +18,7 @@ void init() {
     ACSR |= _BV(ACD);
     // enable pull-ups
     PORTA |= _BV(PA1);
-    PORTB |= _BV(PB2) | _BV(PB3);
+    PORTB |= _BV(PB3);
     PORTD |= _BV(PD0) | _BV(PD1);
 
     init_RTC_clock();
