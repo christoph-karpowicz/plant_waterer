@@ -61,6 +61,7 @@ ISR(INT1_vect) {
         }
         
         if (timer_minutes == 0) {
+            PORTB |= _BV(PB2); // disable battery indicator
             PORTA |= _BV(PA0); // start pump
             set_timer();
             display(DOTS);
@@ -72,6 +73,7 @@ ISR(INT1_vect) {
             PORTA &= ~_BV(PA0); // stop pump
             set_duration();
             display(EMPTY);
+            PORTB &= ~_BV(PB2); // enable battery indicator
         }
     }
 
