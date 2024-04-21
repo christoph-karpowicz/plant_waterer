@@ -3,8 +3,8 @@
 #include "eeprom.h"
 #include "clock.h"
 
-volatile uint8_t current_mode = OFF_MODE;
-volatile uint8_t current_option;
+uint8_t current_mode = OFF_MODE;
+uint8_t current_option;
 
 static const uint16_t opts[7][4] PROGMEM = {
     // MENU_MODE
@@ -63,10 +63,8 @@ void set_mode(const uint8_t mode) {
 
     if (current_mode == OFF_MODE) {
         display(EMPTY);
-        PORTB &= ~_BV(PB2); // enable battery indicator
     } else {
         set_option(0);
-        PORTB |= _BV(PB2); // disable battery indicator
     }
 }
 

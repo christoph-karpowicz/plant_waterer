@@ -24,8 +24,9 @@ static void set_timer() {
     uint16_t timer_top = (uint16_t)DAYS_TO_MINUTES(EEPROM_read(INTERVAL_DAYS_ADDRESS))
         + (uint16_t)HOURS_TO_MINUTES(EEPROM_read(INTERVAL_HOURS_ADDRESS))
         + (uint16_t)EEPROM_read(INTERVAL_MINUTES_ADDRESS);
-    if (timer_top < SECONDS_TO_MINUTES(duration + 60)) {
-        timer_top = SECONDS_TO_MINUTES(duration + 60);
+    const uint16_t duration_with_buffer = SECONDS_TO_MINUTES(duration + 60);
+    if (timer_top < duration_with_buffer) {
+        timer_top = duration_with_buffer;
     }
     timer_minutes = timer_top;
 }
@@ -55,13 +56,18 @@ ISR(INT1_vect) {
         timer_seconds = 60;
     }
 
+    if (timer_seconds % 5 == 0) {
+        PORTB &= ~_BV(PB2); // enable battery indicator
+    } else {
+        PORTB |= _BV(PB2); // disable battery indicator
+    }
+
     if (!(PINA & _BV(PA0))) { // is pump off
         if (timer_minutes > 1) {
             goto end;
         }
         
         if (timer_minutes == 0) {
-            PORTB |= _BV(PB2); // disable battery indicator
             PORTA |= _BV(PA0); // start pump
             set_timer();
             display(DOTS);
@@ -73,7 +79,6 @@ ISR(INT1_vect) {
             PORTA &= ~_BV(PA0); // stop pump
             set_duration();
             display(EMPTY);
-            PORTB &= ~_BV(PB2); // enable battery indicator
         }
     }
 
