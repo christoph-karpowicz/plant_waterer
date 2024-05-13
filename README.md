@@ -21,6 +21,8 @@ This repository contains source code for a configurable plant watering device.
 
 As mentioned in the "Features" section, a display and two buttons are used to interact with the device.
 
+![Navigation schematic](docs/plant_waterer_navigation.png)
+
 To open the menu, press the blue button. After doing that, you'll see `I.` on the display.  
 From there on, you can navigate through the menu.  
 Press:  
@@ -89,7 +91,8 @@ An example of setting the watering interval's days to `2`:
 - 1N4007 rectifying diode
 - 2 74HC595 shift registers
 
-<!-- ## Photos
+## Photos
 
-![Plant waterer board](docs/plant_waterer1.jpg)
-![Plant waterer](docs/plant_waterer2.jpg) -->
+![Plant waterer 1](docs/plant_waterer1.jpg)
+![Plant waterer 2](docs/plant_waterer2.jpg)
+![Plant waterer 3](docs/plant_waterer3.jpg)
